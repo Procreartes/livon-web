@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo Livon — Entretenimiento · Producción · Consultoría</title>
+    <meta name="description" content="Grupo Livon. Producción de eventos, distribución artística, consultoría y asociacionismo en Canarias.">
+    <meta property="og:title" content="Grupo Livon">
+    <meta property="og:description" content="Producción de eventos, distribución artística, consultoría y asociacionismo en Canarias.">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --beige: #e8e3dc;
+            --beige-light: #f2efe9;
+            --beige-dark: #d9d3cb;
+            --charcoal: #3a3a3a;
+            --charcoal-light: #555555;
+            --charcoal-dark: #2a2a2a;
+            --white: #ffffff;
+            --black: #1a1a1a;
+            --dot-color: #3a3a3a;
+            --cyan: #00a0b0;
+            --red-accent: #e63328;
+            --font-main: 'DM Sans', 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--beige);
+            color: var(--charcoal);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           PAGE LOADER
+           ============================================ */
+        .page-loader {
+            position: fixed; inset: 0; z-index: 100000;
+            background: var(--beige);
+            display: flex; align-items: center; justify-content: center;
+            animation: autoHideLoader 0.5s ease 2.5s forwards;
+        }
+        .loader-dots { display: flex; gap: 12px; }
+        .loader-dots span {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--charcoal);
+            animation: dotBounce 1.4s infinite ease-in-out both;
+        }
+        .loader-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.4); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes autoHideLoader { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            padding: 20px 40px;
+            background: transparent;
+            transition: background 0.4s, padding 0.4s, box-shadow 0.4s;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .navbar.scrolled {
+            background: rgba(232, 227, 220, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 40px;
+            box-shadow: 0 1px 0 rgba(58, 58, 58, 0.08);
+        }
+        .nav-logo {
+            font-family: var(--font-main);
+            font-size: 1.6rem; font-weight: 700;
+            color: var(--charcoal-dark);
+            text-decoration: none; letter-spacing: -0.5px;
+        }
+        .nav-logo span { position: relative; }
+        .nav-logo .dot {
+            display: inline-block; width: 8px; height: 8px;
+            background: var(--charcoal); border-radius: 50%;
+            margin-left: 2px; vertical-align: baseline;
+        }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            text-decoration: none; color: var(--charcoal);
+            font-size: 0.85rem; font-weight: 500;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            transition: color var(--transition);
+        }
+        .nav-links a:hover { color: var(--charcoal-dark); }
+
+        .hamburger {
+            display: none; flex-direction: column; gap: 5px;
+            background: none; border: none; cursor: pointer; padding: 4px;
+        }
+        .hamburger span {
+            width: 24px; height: 2px; background: var(--charcoal);
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .mobile-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9998;
+            background: var(--beige); flex-direction: column;
+            align-items: center; justify-content: center; gap: 32px;
+        }
+        .mobile-overlay.active { display: flex; }
+        .mobile-overlay a {
+            font-family: var(--font-main); font-size: 1.4rem;
+            color: var(--charcoal); text-decoration: none;
+            font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        /* ============================================
+           HERO
+           ============================================ */
+        .hero {
+            min-height: 100vh; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px 24px;
+            position: relative; overflow: hidden;
+        }
+
+        /* Decorative dots */
+        .hero-dot {
+            position: absolute; border-radius: 50%; background: var(--charcoal);
+            opacity: 0.07;
+        }
+        .hero-dot:nth-child(1) { width: 180px; height: 180px; top: 8%; left: 5%; }
+        .hero-dot:nth-child(2) { width: 120px; height: 120px; top: 40%; right: 8%; }
+        .hero-dot:nth-child(3) { width: 80px; height: 80px; bottom: 15%; left: 15%; }
+        .hero-dot:nth-child(4) { width: 60px; height: 60px; top: 20%; right: 25%; }
+
+        .hero-logo {
+            font-family: var(--font-main);
+            font-size: clamp(4rem, 12vw, 10rem);
+            font-weight: 700; color: var(--charcoal-dark);
+            letter-spacing: -3px; line-height: 1;
+            margin-bottom: 32px; position: relative; z-index: 1;
+        }
+        .hero-logo .dot {
+            display: inline-block; width: clamp(14px, 2.5vw, 28px);
+            height: clamp(14px, 2.5vw, 28px);
+            background: var(--charcoal-dark); border-radius: 50%;
+            vertical-align: baseline; margin-left: 4px;
+        }
+        .hero-tagline {
+            font-family: var(--font-body);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: 300; color: var(--charcoal-light);
+            letter-spacing: 3px; text-transform: uppercase;
+            position: relative; z-index: 1;
+        }
+        .scroll-indicator {
+            position: absolute; bottom: 40px;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: var(--charcoal-light); font-size: 0.7rem;
+            letter-spacing: 3px; text-transform: uppercase;
+        }
+        .scroll-indicator .line {
+            width: 1px; height: 48px; background: var(--charcoal);
+            opacity: 0.3; animation: scrollPulse 2s infinite;
+        }
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(1); opacity: 0.3; }
+            50% { transform: scaleY(0.5); opacity: 0.6; }
+        }
+
+        /* ============================================
+           UTILITY
+           ============================================ */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        .section { padding: 120px 0; }
+
+        .section-label {
+            font-family: var(--font-body); font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: var(--charcoal-light); margin-bottom: 16px;
+            display: inline-block;
+        }
+        .section-title {
+            font-family: var(--font-main);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700; color: var(--charcoal-dark);
+            line-height: 1.2; margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+        .section-line {
+            width: 40px; height: 2px;
+            background: var(--charcoal); margin-bottom: 32px;
+        }
+        .section-text {
+            font-size: 1.05rem; line-height: 1.8;
+            color: var(--charcoal-light); max-width: 640px;
+        }
+
+        /* Reveal */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; animation: cssRevealFallback 0.8s ease 2s forwards; }
+        .reveal.visible { opacity: 1; transform: translateY(0); animation: none; }
+        @keyframes cssRevealFallback { to { opacity: 1; transform: none; } }
+
+        /* ============================================
+           ABOUT SECTION
+           ============================================ */
+        .about { background: var(--beige-light); }
+        .about-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 80px; align-items: center;
+        }
+        .about-visual {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 24px;
+        }
+        .about-dots {
+            display: grid; grid-template-columns: repeat(5, 16px);
+            gap: 12px;
+        }
+        .about-dots span {
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--charcoal); opacity: 0.12;
+        }
+        .about-dots span:nth-child(3),
+        .about-dots span:nth-child(7),
+        .about-dots span:nth-child(13),
+        .about-dots span:nth-child(18),
+        .about-dots span:nth-child(22) { opacity: 0.5; }
+        .about-dots span:nth-child(8),
+        .about-dots span:nth-child(15),
+        .about-dots span:nth-child(20) { opacity: 1; }
+
+        /* ============================================
+           EMPRESAS / BRANDS
+           ============================================ */
+        .empresas-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 32px; margin-top: 56px;
+        }
+        .empresa-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 48px 40px;
+            text-align: center;
+            transition: transform var(--transition), box-shadow var(--transition);
+            border: 1px solid rgba(58, 58, 58, 0.06);
+            text-decoration: none; color: inherit;
+            display: block;
+        }
+        .empresa-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.06);
+        }
+        .empresa-logo {
+            height: 72px; max-width: 180px;
+            object-fit: contain;
+            margin: 0 auto 24px; display: block;
+            mix-blend-mode: multiply;
+        }
+        .empresa-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px; font-size: 1.5rem;
+        }
+        .empresa-icon.buque { background: var(--charcoal); color: var(--beige); }
+        .empresa-icon.asociaciones { background: #5b7a5e; color: white; }
+
+        .empresa-card h3 {
+            font-family: var(--font-main); font-size: 1.2rem;
+            font-weight: 700; margin-bottom: 8px;
+            color: var(--charcoal-dark);
+        }
+        .empresa-card .empresa-tipo {
+            font-size: 0.75rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--charcoal-light);
+            margin-bottom: 16px; font-weight: 500;
+        }
+        .empresa-card p {
+            font-size: 0.95rem; color: var(--charcoal-light);
+            line-height: 1.6;
+        }
+        .empresa-card .card-arrow {
+            display: inline-block; margin-top: 20px;
+            font-size: 0.8rem; color: var(--charcoal);
+            letter-spacing: 1.5px; text-transform: uppercase;
+            font-weight: 600; opacity: 0.4;
+            transition: opacity var(--transition);
+        }
+        .empresa-card:hover .card-arrow { opacity: 1; }
+
+        /* ============================================
+           CONTACTO
+           ============================================ */
+        .contacto { background: var(--charcoal-dark); color: var(--beige); }
+        .contacto .section-label { color: rgba(232, 227, 220, 0.5); }
+        .contacto .section-title { color: var(--beige); }
+        .contacto .section-line { background: var(--beige); opacity: 0.3; }
+        .contacto-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 60px; margin-top: 48px;
+        }
+        .contacto-info p {
+            font-size: 1.05rem; line-height: 2;
+            color: rgba(232, 227, 220, 0.7);
+        }
+        .contacto-info a {
+            color: var(--beige); text-decoration: none;
+            transition: opacity var(--transition);
+        }
+        .contacto-info a:hover { opacity: 0.7; }
+        .contacto-info .info-item {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 20px;
+        }
+        .contacto-info .info-item i {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 1px solid rgba(232, 227, 220, 0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: var(--beige);
+        }
+        .social-links {
+            display: flex; gap: 16px; margin-top: 40px;
+        }
+        .social-links a {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid rgba(232, 227, 220, 0.15);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--beige); text-decoration: none;
+            transition: all var(--transition); font-size: 1rem;
+        }
+        .social-links a:hover {
+            background: var(--beige); color: var(--charcoal-dark);
+        }
+
+        /* ============================================
+           LEGAL
+           ============================================ */
+        .legal-section { background: var(--black); color: rgba(232, 227, 220, 0.4); }
+        .legal-content {
+            display: flex; align-items: center;
+            justify-content: space-between; padding: 40px 0;
+        }
+        .legal-links { display: flex; gap: 32px; }
+        .legal-links a {
+            color: rgba(232, 227, 220, 0.4); text-decoration: none;
+            font-size: 0.8rem; letter-spacing: 1px;
+            transition: color var(--transition);
+        }
+        .legal-links a:hover { color: var(--beige); }
+        .legal-copy { font-size: 0.8rem; }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            background: var(--black); border-top: 1px solid rgba(232, 227, 220, 0.06);
+            padding: 24px 0; text-align: center;
+        }
+        .footer-logo {
+            font-family: var(--font-main); font-size: 1.2rem;
+            font-weight: 700; color: rgba(232, 227, 220, 0.3);
+            letter-spacing: -0.5px;
+        }
+        .footer-logo .dot {
+            display: inline-block; width: 6px; height: 6px;
+            background: rgba(232, 227, 220, 0.3); border-radius: 50%;
+            margin-left: 1px; vertical-align: baseline;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 900px) {
+            .about-grid { grid-template-columns: 1fr; gap: 48px; }
+            .about-visual { order: -1; }
+            .empresas-grid { grid-template-columns: 1fr; }
+            .contacto-grid { grid-template-columns: 1fr; gap: 40px; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .navbar { padding: 16px 24px; }
+            .navbar.scrolled { padding: 12px 24px; }
+            .section { padding: 80px 0; }
+            .hero-logo { letter-spacing: -2px; }
+            .empresa-card { padding: 36px 28px; }
+            .legal-content {
+                flex-direction: column; gap: 16px;
+                text-align: center;
+            }
+            .legal-links { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="loader">
+        <div class="loader-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">livón<span class="dot"></span></a>
+        <ul class="nav-links">
+            <li><a href="#sobre">Sobre Livon</a></li>
+            <li><a href="#empresas">Empresas</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menú">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay">
+        <a href="#sobre">Sobre Livon</a>
+        <a href="#empresas">Empresas</a>
+        <a href="#contacto">Contacto</a>
+    </div>
+
+    <!-- ============================================
+         S1: HERO
+         ============================================ -->
+    <section class="hero" id="hero">
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
+
+        <img src="img/logo-livon.png" alt="Livon" style="width: clamp(200px, 35vw, 420px); position: relative; z-index: 1; margin-bottom: 32px; mix-blend-mode: multiply;">
+        <p class="hero-tagline">Entretenimiento · Producción · Consultoría</p>
+
+        <div class="scroll-indicator">
+            <div class="line"></div>
+            <span>scroll</span>
+        </div>
+    </section>
+
+    <!-- ============================================
+         S2: SOBRE LIVON
+         ============================================ -->
+    <section class="section about" id="sobre">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content reveal">
+                    <span class="section-label">El grupo</span>
+                    <h2 class="section-title">Ideas que conectan, proyectos que importan</h2>
+                    <div class="section-line"></div>
+                    <p class="section-text">
+                        Livon es un grupo empresarial canario que nace de la convicción de que las buenas ideas merecen buenos compañeros de viaje. Desde la producción de eventos hasta la consultoría estratégica, pasando por la distribución artística y el asociacionismo, cada empresa del grupo comparte un mismo ADN: hacer las cosas bien, con criterio y con alma.
+                    </p>
+                    <p class="section-text" style="margin-top: 20px;">
+                        Operamos desde Canarias con vocación de ir más allá. Nuestro ecosistema de marcas permite ofrecer soluciones integrales a artistas, empresas e instituciones que buscan algo más que un proveedor: buscan un aliado.
+                    </p>
+                </div>
+                <div class="about-visual reveal">
+                    <div class="about-dots">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         S3: EMPRESAS DEL GRUPO
+         ============================================ -->
+    <section class="section" id="empresas">
+        <div class="container">
+            <div style="text-align: center;" class="reveal">
+                <span class="section-label">Nuestras empresas</span>
+                <h2 class="section-title">El ecosistema Livon</h2>
+                <div class="section-line" style="margin: 0 auto 16px;"></div>
+                <p class="section-text" style="margin: 0 auto; text-align: center;">
+                    Cuatro marcas, un mismo propósito: crear valor a través de la cultura, la comunicación y la conexión entre personas.
+                </p>
+            </div>
+
+            <div class="empresas-grid">
+                <a href="#" class="empresa-card reveal">
+                    <img src="img/logo-dislate.png" alt="Dislate Producciones" class="empresa-logo">
+                    <div class="empresa-tipo">Producción de eventos</div>
+                    <h3>Dislate Producciones</h3>
+                    <p>Producción integral de eventos, espectáculos y festivales. Desde la idea hasta el escenario, nos encargamos de que cada proyecto cobre vida con la máxima calidad.</p>
+                    <span class="card-arrow">Próximamente →</span>
+                </a>
+
+                <a href="#" class="empresa-card reveal">
+                    <div class="empresa-icon buque"><i class="fas fa-ship"></i></div>
+                    <div class="empresa-tipo">Distribución artística</div>
+                    <h3>Me Cabe un Buque</h3>
+                    <p>Representación y distribución de artistas y espectáculos. Conectamos talento con escenarios, gestionando giras, contrataciones y desarrollo de carrera artística.</p>
+                    <span class="card-arrow">Próximamente →</span>
+                </a>
+
+                <a href="#" class="empresa-card reveal">
+                    <img src="img/logo-naroe.png" alt="Naroe Consulting" class="empresa-logo">
+                    <div class="empresa-tipo">Consultoría</div>
+                    <h3>Naroe Consulting</h3>
+                    <p>Consultoría estratégica, comunicación y desarrollo de proyectos. Ayudamos a empresas e instituciones a encontrar su camino con claridad y visión de futuro.</p>
+                    <span class="card-arrow">Próximamente →</span>
+                </a>
+
+                <a href="#" class="empresa-card reveal">
+                    <div class="empresa-icon asociaciones"><i class="fas fa-handshake"></i></div>
+                    <div class="empresa-tipo">Asociacionismo</div>
+                    <h3>Asociaciones Canarias</h3>
+                    <p>Plataforma de apoyo al tejido asociativo canario. Facilitamos herramientas, formación y acompañamiento para que las asociaciones crezcan y se profesionalicen.</p>
+                    <span class="card-arrow">Próximamente →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         S4: CONTACTO
+         ============================================ -->
+    <section class="section contacto" id="contacto">
+        <div class="container">
+            <div class="contacto-grid">
+                <div class="reveal">
+                    <span class="section-label">Hablemos</span>
+                    <h2 class="section-title">¿Tienes un proyecto en mente?</h2>
+                    <div class="section-line"></div>
+                    <p style="color: rgba(232,227,220,0.6); font-size: 1.05rem; line-height: 1.8; max-width: 480px;">
+                        Ya sea un evento, una gira, una estrategia de comunicación o una idea que todavía no tiene nombre — estamos aquí para escucharte.
+                    </p>
+                </div>
+                <div class="contacto-info reveal">
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:hola@grupolivon.com">hola@grupolivon.com</a>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:+34609627452">+34 609 627 452</a>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span style="color: rgba(232,227,220,0.7);">Las Palmas de Gran Canaria</span>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/grupolivon/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/grupolivon/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.facebook.com/grupolivon/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         LEGAL + FOOTER
+         ============================================ -->
+    <section class="legal-section">
+        <div class="container">
+            <div class="legal-content">
+                <div class="legal-links">
+                    <a href="#aviso-legal">Aviso Legal</a>
+                    <a href="#privacidad">Política de Privacidad</a>
+                    <a href="#cookies">Política de Cookies</a>
+                </div>
+                <span class="legal-copy">© 2026 Grupo Livon. Todos los derechos reservados.</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-logo">livón<span class="dot"></span></div>
+    </footer>
+
+    <!-- ============================================
+         JAVASCRIPT
+         ============================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        /* Loader */
+        try {
+            var loader = document.getElementById('loader');
+            if (loader) {
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        loader.style.opacity = '0';
+                        loader.style.visibility = 'hidden';
+                        loader.style.pointerEvents = 'none';
+                    }, 400);
+                });
+                setTimeout(function() {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                    loader.style.pointerEvents = 'none';
+                }, 3000);
+            }
+        } catch(e) {}
+
+        /* Navbar scroll */
+        try {
+            var navbar = document.getElementById('navbar');
+            if (navbar) {
+                window.addEventListener('scroll', function() {
+                    navbar.classList.toggle('scrolled', window.scrollY > 60);
+                });
+            }
+        } catch(e) {}
+
+        /* Hamburger */
+        try {
+            var hamburger = document.getElementById('hamburger');
+            var overlay = document.getElementById('mobileOverlay');
+            if (hamburger && overlay) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    document.body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+                });
+                overlay.querySelectorAll('a').forEach(function(a) {
+                    a.addEventListener('click', function() {
+                        hamburger.classList.remove('active');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+        } catch(e) {}
+
+        /* Reveal on Scroll */
+        try {
+            var reveals = document.querySelectorAll('.reveal');
+            if (reveals.length > 0 && 'IntersectionObserver' in window) {
+                var revObs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(e) {
+                        if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+                reveals.forEach(function(el) { revObs.observe(el); });
+            } else {
+                reveals.forEach(function(el) { el.classList.add('visible'); });
+            }
+        } catch(e) {
+            document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+        }
+
+        /* Smooth Scroll */
+        try {
+            document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+                a.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href');
+                    if (href === '#') return;
+                    e.preventDefault();
+                    var t = document.querySelector(href);
+                    if (t) {
+                        var nav = document.getElementById('navbar');
+                        var off = nav ? nav.offsetHeight : 80;
+                        window.scrollTo({ top: t.getBoundingClientRect().top + window.pa
